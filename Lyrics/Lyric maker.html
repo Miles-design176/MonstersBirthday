@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Jam Lyrics Test</title>
+<style>
+:root{--bg:#09090b;--card:#131316;--line:#ffffff26;--fg:#f4f4f6;--mute:#a9a6b3;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:var(--bg);color:var(--fg);font:16px/1.55 "Fredoka","Nunito","Trebuchet MS",system-ui,sans-serif;padding:34px 16px 60px}
+main{max-width:720px;margin:auto}h1{font-size:clamp(1.8rem,6vw,2.5rem);margin:0 0 4px}p{color:var(--mute);margin:4px 0 18px}.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:18px 0}.jamc{width:min(420px,100%);margin:20px auto 0;background:linear-gradient(#202026,#0b0b0d);border:1px solid var(--line);border-radius:22px;padding:20px;text-align:left;box-shadow:0 14px 40px #0008}.jh{display:flex;justify-content:space-between;color:var(--mute);font-size:.8rem;margin-bottom:12px}.avs{display:flex;margin:0 auto 12px;justify-content:center}.jav{width:42px;height:42px;border-radius:50%;border:2px solid #1db954;background:#2a2a31;display:grid;place-items:center}.jav+.jav{margin-left:-10px;background:#48315c}.pt{text-align:center;display:flex;flex-direction:column;line-height:1.25}.pt b{font-size:1.15rem}.pt span{font-size:.82rem;color:var(--mute)}.art{height:110px;width:110px;border-radius:12px;margin:16px auto;background:linear-gradient(135deg,#4a285f,#17171b 55%,#1db954);display:grid;place-items:center;font-size:2rem}.lyr{box-sizing:border-box;display:flex;align-items:center;justify-content:center;height:4.5em;min-height:4.5em;padding:4px 16px 14px;font:italic 1.25rem/1.4 Georgia,"Times New Roman",serif;text-align:center;overflow:hidden}.lyr span{display:inline-block;max-width:100%;opacity:0;transition:opacity .35s ease,font-size .18s ease;will-change:opacity,font-size}.controls{display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0}.ib{width:42px;height:42px;border:0;border-radius:50%;background:none;color:var(--fg);font-size:1.15rem;cursor:pointer}.ib:hover{background:#ffffff1a}.ib.go{background:#1db954;color:#000;font-size:1.25rem}.seek{display:flex;align-items:center;gap:10px;margin-top:14px;color:var(--mute);font-size:.78rem}input[type=range]{flex:1;min-width:0;accent-color:#1db954}.prog{height:3px;background:#ffffff26;margin:14px -20px -20px}.prog i{display:block;height:100%;width:0;background:#1db954}.field{display:grid;gap:7px;margin:14px 0}label{font-weight:600}input[type=text],textarea{width:100%;border:1px solid var(--line);border-radius:10px;background:#0f0f12;color:var(--fg);padding:11px 12px;font:inherit}textarea{min-height:220px;resize:vertical;font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;tab-size:2}.btn{border:0;border-radius:999px;background:#1db954;color:#000;font:inherit;font-weight:700;padding:10px 18px;cursor:pointer}.btn.secondary{background:#303038;color:var(--fg)}.btn:disabled{opacity:.42;cursor:not-allowed}.sync-current{font-size:1.05rem;font-weight:700;color:var(--fg)}.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.hint{font-size:.86rem;color:var(--mute)}.status{min-height:1.4em;color:#ff9a3c;font-size:.88rem}.time{font-variant-numeric:tabular-nums;min-width:36px}.tag{color:#1db954;font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+@media(max-width:480px){body{padding:24px 12px}.panel{padding:14px}.jamc{padding:16px}.prog{margin-left:-16px;margin-right:-16px;margin-bottom:-16px}}
+</style></head>
+<body><main>
+<h1>Jam lyrics test</h1><p>Just the Spotify-style Jam player and lyric timing. No birthday page, animations, or Easter eggs.</p>
+<section class="jamc" aria-label="Jam player preview">
+ <div class="jh"><span>Jam · Lyrics preview</span><span>2 listening</span></div>
+ <div class="avs"><i class="jav">M</i><i class="jav">♡</i></div>
+ <div class="pt"><b id="songTitle">Thinking about you</b><span id="songBy">Added by Milis</span></div>
+ <div class="art">♫</div>
+ <div class="lyr" id="lyr" aria-live="off"><span id="lineText">Your lyrics will appear here</span></div>
+ <div class="controls"><button class="ib" id="back5" title="Back 5 seconds">↶</button><button class="ib go" id="play" title="Play or pause">▶</button><button class="ib" id="forward5" title="Forward 5 seconds">↷</button></div>
+ <div class="seek"><span class="time" id="now">0:00</span><input id="seek" type="range" min="0" max="1000" value="0" aria-label="Song position"><span class="time" id="duration">0:00</span></div>
+ <div class="prog"><i id="fill"></i></div>
+</section>
+<section class="panel">
+ <div class="tag">Preview settings</div>
+ <div class="field"><label for="title">Song title</label><input id="title" type="text" value="Thinking about you"></div>
+ <div class="field"><label for="by">Artist / added by</label><input id="by" type="text" value="Milis"></div>
+ <div class="field"><label for="audio">Optional audio file (for real-time syncing)</label><input id="audio" type="file" accept="audio/*"></div>
+ <p class="hint">If you don't add audio, use Play and the timeline slider to preview the lyric timings against a simulated clock.</p>
+</section>
+<section class="panel">
+ <div class="tag">Enter-to-sync mode</div>
+ <p class="hint">Paste your lyrics below, one line per row. Start playback, then press <b>Enter</b> (or the button) when each line begins and press it again when that line ends. The tester will move to the next line automatically.</p>
+ <div class="field"><label for="syncLyrics">Lyrics to sync (one line per row)</label><textarea id="syncLyrics" spellcheck="false" style="min-height:250px">I'm asleep in the moment, you're holdin' my head
+But I want you now, you're asleep when you're dead
+I'm thinkin' about
+Thinkin' about you
+I'm thinkin' about
+Thinkin' about you
+And you said you were sure it'll work out this time
+Well, I'm holding you to it, I knew you were right
+I'm thinkin' about
+Thinkin' about you
+I'm thinkin' about
+Thinkin' about you
+I'm thinkin' about
+Thinkin' about you
+I'm thinkin' about
+Thinkin' about you
+I'm thinkin' about
+Thinkin' about you
+I'm thinkin' about
+Thinkin' about you
+I'm thinkin' about
+Thinkin' about you
+I'm thinkin' about
+Thinkin' about you
+I'm thinkin' about
+Thinkin' about you
+I'm thinkin' about
+Thinkin' about you
+I'm thinkin' about
+Thinkin' about you
+I'm thinkin' about
+Thinkin' about you
+I'm thinkin' about
+Thinkin' about you
+I'm</textarea></div>
+ <div class="row"><button class="btn" id="startSync">Start / reset sync</button><button class="btn secondary" id="markSync" disabled>Enter · Mark start</button><button class="btn secondary" id="undoSync" disabled>Undo last line</button></div>
+ <p class="hint" id="syncProgress">Paste your lyrics, then choose Start / reset sync.</p>
+ <div class="status" id="syncStatus" role="status" aria-live="polite"></div>
+ <div class="field"><label for="syncOutput">Generated timestamp array</label><textarea id="syncOutput" spellcheck="false" readonly placeholder="Your timestamp array will appear here as you sync..."></textarea></div>
+ <div class="row"><button class="btn secondary" id="useSynced" disabled>Use these timestamps in the tester</button><button class="btn secondary" id="copySynced" disabled>Copy synced array</button></div>
+ <p class="hint">Keyboard tip: Enter works while you're on this page, except when typing in a text field. You can also click the Mark start / Mark end button.</p>
+</section>
+<section class="panel">
+ <div class="tag">Lyrics and timestamps</div>
+ <p class="hint">Paste the lyrics in the same format used by your birthday page: <code>[startSeconds, endSeconds, "line"]</code>. Times are seconds from the start of the song.</p>
+ <div class="field"><label for="lyrics">Lyric array</label><textarea id="lyrics" spellcheck="false">[
+  [0, 5, "I'm thinking of you"],
+  [8, 12, "You're the one"],
+  [13.5, 17, "Add your next line here"]
+]</textarea></div>
+ <div class="row"><button class="btn" id="apply">Apply lyrics</button><button class="btn secondary" id="sample">Restore sample</button><button class="btn secondary" id="copy">Copy lyric array</button></div>
+ <div class="status" id="status" role="status"></div>
+ <p class="hint">You can also use the older two-part format <code>[startSeconds, "line"]</code>; its end time will be the next line's start.</p>
+</section>
+<audio id="audioPlayer" preload="metadata"></audio>
+</main>
+<script>
+(function(){
+ const $=id=>document.getElementById(id), audio=$('audioPlayer');
+ const sample='[\n  [0, 5, "I\'m thinking of you"],\n  [8, 12, "You\'re the one"],\n  [13.5, 17, "Add your next line here"]\n]';
+ let lines=[],simTime=0,playing=false,lastText='',raf=0,lastFrame=0,usingAudio=false;
+ const FADE_IN=.35,FADE_OUT=.65;
+ function fmt(t){t=Math.max(0,Number(t)||0);return Math.floor(t)+'s'}
+ function parse(){try{const v=Function('"use strict";return ('+$('lyrics').value+')')();if(!Array.isArray(v))throw Error('The lyrics must be an array.');lines=v.map((a,i)=>{if(!Array.isArray(a)||a.length<2)throw Error('Line '+(i+1)+' is not a valid lyric entry.');const start=Number(a[0]);const end=a.length>=3?Number(a[1]):(i+1<v.length?Number(v[i+1][0]):Infinity);const text=String(a.length>=3?a[2]:a[1]);if(!Number.isFinite(start)||start<0||!(end===Infinity||(Number.isFinite(end)&&end>start)))throw Error('Check the timestamps on line '+(i+1)+'. End must be after start.');return {start,end,text};});lines.sort((a,b)=>a.start-b.start);lastText='';$('status').textContent='Loaded '+lines.length+' lyric lines.';tick();return true}catch(e){$('status').textContent='Could not read lyrics: '+e.message;return false}}
+ function fitLyric(){const box=$('lyr'),span=$('lineText');if(!span.textContent)return;const max=20,min=13.5;let size=max;span.style.fontSize=size+'px';while(size>min&&(span.scrollWidth>box.clientWidth-32||span.scrollHeight>box.clientHeight-18)){size-=.5;span.style.fontSize=size+'px';}}
+ function current(){return usingAudio?(audio.currentTime||0):simTime}
+ function total(){return usingAudio&&Number.isFinite(audio.duration)?audio.duration:Math.max(30,...lines.map(x=>Number.isFinite(x.end)?x.end:x.start+5),current()+1)}
+ function tick(){const t=current();let active=null;for(const l of lines){if(t>=l.start&&t<l.end){active=l;break}}const txt=active?active.text:'';if(txt!==lastText){lastText=txt;$('lineText').textContent=txt;$('lineText').style.fontSize='20px';$('lineText').style.opacity='0';requestAnimationFrame(fitLyric)}if(active){const fadeIn=FADE_IN>0?Math.min(1,(t-active.start)/FADE_IN):1;const fadeOut=FADE_OUT>0?Math.min(1,(active.end-t)/FADE_OUT):1;$('lineText').style.opacity=String(Math.max(0,Math.min(1,fadeIn,fadeOut)))}else $('lineText').style.opacity='0';const d=total();$('now').textContent=fmt(t);$('duration').textContent=fmt(d);$('seek').value=d?Math.round(t/d*1000):0;$('fill').style.width=(d?Math.min(100,t/d*100):0)+'%'}
+ function frame(ts){if(!playing)return;if(!usingAudio){if(lastFrame)simTime+=(ts-lastFrame)/1000;lastFrame=ts;}tick();raf=requestAnimationFrame(frame)}
+ function setPlaying(v){playing=v;$('play').textContent=playing?'Ⅱ':'▶';if(playing){if(usingAudio){audio.play().catch(()=>{playing=false;$('play').textContent='▶'})}lastFrame=0;raf=requestAnimationFrame(frame)}else{if(usingAudio)audio.pause();cancelAnimationFrame(raf);tick()}}
+ $('play').onclick=()=>setPlaying(!playing);$('back5').onclick=()=>jump(-5);$('forward5').onclick=()=>jump(5);function jump(n){if(usingAudio)audio.currentTime=Math.max(0,audio.currentTime+n);else simTime=Math.max(0,simTime+n);tick()}
+ $('seek').oninput=()=>{const t=Number($('seek').value)/1000*total();if(usingAudio)audio.currentTime=t;else simTime=t;tick()};
+ $('apply').onclick=parse;$('sample').onclick=()=>{$('lyrics').value=sample;parse()};$('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('lyrics').value);$('status').textContent='Lyric array copied.'}catch(e){$('lyrics').select();$('status').textContent='Select the text and copy it.'}};
+ let syncLines=[],syncIndex=0,syncStart=null,synced=[];
+ function syncArray(){return '[\n'+synced.map(x=>'  ['+x[0]+', '+x[1]+', '+JSON.stringify(x[2])+']').join(',\n')+'\n]'}
+ function syncUi(){const ready=syncLines.length>0&&syncIndex<syncLines.length;$('markSync').disabled=!ready;$('undoSync').disabled=synced.length===0;$('useSynced').disabled=synced.length===0;$('copySynced').disabled=synced.length===0;$('markSync').textContent=syncStart===null?'Enter · Mark start':'Enter · Mark end';$('syncProgress').textContent=syncLines.length?(syncIndex>=syncLines.length?'All '+syncLines.length+' lines synced.':('Line '+(syncIndex+1)+' of '+syncLines.length+' · '+synced.length+' completed')+'\n'+syncLines[syncIndex]):'Paste your lyrics, then choose Start / reset sync.';$('syncOutput').value=syncArray();}
+ function beginSync(){syncLines=$('syncLyrics').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);if(!syncLines.length){$('syncStatus').textContent='Paste at least one lyric line first.';return}syncIndex=0;syncStart=null;synced=[];$('syncStatus').textContent='Ready. Start the song, then mark the beginning of the first line.';syncUi();$('markSync').focus();}
+ function markSync(){if(!syncLines.length||syncIndex>=syncLines.length)return;const t=Math.round(current()*100)/100;if(syncStart===null){syncStart=t;$('syncStatus').textContent='Start marked at '+t+'s. Press Enter when this line ends.';syncUi();return}if(t<=syncStart){$('syncStatus').textContent='The end time must be later than the start time. Keep playing, then press Enter again.';return}synced.push([syncStart,t,syncLines[syncIndex]]);syncStart=null;syncIndex++;$('syncStatus').textContent='Saved line '+synced.length+' ('+t+'s). '+(syncIndex<syncLines.length?'Next line is ready.':'All lines synced!');syncUi();}
+ $('startSync').onclick=beginSync;$('markSync').onclick=markSync;
+ $('undoSync').onclick=()=>{if(syncStart!==null){syncStart=null;$('syncStatus').textContent='Current start mark cleared.'}else if(synced.length){synced.pop();syncIndex=Math.max(0,syncIndex-1);$('syncStatus').textContent='Last completed line removed. You can sync it again.'}syncUi()};
+ $('useSynced').onclick=()=>{$('lyrics').value=syncArray();parse();$('status').textContent='Loaded '+synced.length+' synced lines into the lyric preview.'};
+ $('copySynced').onclick=async()=>{try{await navigator.clipboard.writeText(syncArray());$('syncStatus').textContent='Timestamp array copied.'}catch(e){$('syncOutput').select();$('syncStatus').textContent='Select the generated array and copy it.'}};
+ document.addEventListener('keydown',e=>{if(e.key!=='Enter'||e.repeat||e.ctrlKey||e.altKey||e.metaKey)return;const tag=(document.activeElement&&document.activeElement.tagName||'').toLowerCase();if(['input','textarea','button','select'].includes(tag))return;if(syncLines.length&&syncIndex<syncLines.length){e.preventDefault();markSync()}});
+ $('title').oninput=()=>{$('songTitle').textContent=$('title').value||'Untitled song'};$('by').oninput=()=>{$('songBy').textContent='Added by '+($('by').value||'Unknown')};
+ $('audio').onchange=()=>{const f=$('audio').files[0];if(!f)return;setPlaying(false);audio.src=URL.createObjectURL(f);usingAudio=true;simTime=0;audio.onloadedmetadata=()=>{tick();$('status').textContent='Audio loaded. Lyrics now sync to the selected track.'};audio.onerror=()=>$('status').textContent='Could not load that audio file.'};
+ audio.ontimeupdate=tick;audio.onended=()=>setPlaying(false);parse();tick();
+})();
+</script></body></html>

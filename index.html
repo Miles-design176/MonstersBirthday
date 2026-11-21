@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Happy 20th, Monster</title>
+<style>
+:root{--bg:#09090b;--card:#131316;--line:#ffffff26;--fg:#f4f4f6;--mute:#a9a6b3;--orchid:#b57bff;--pink:#ff7eb6;--orange:#ff9a3c;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 "Fredoka","Nunito","Trebuchet MS",system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:3px solid var(--pink);outline-offset:3px}
+.hidden{display:none!important}
+.stage{display:none;min-height:100vh}.stage.on{display:block}
+.btn{padding:13px 26px;border-radius:999px;border:0;background:var(--fg);color:var(--bg);font-weight:600;transition:background .2s,transform .1s}
+.btn:hover{background:var(--pink)}.btn:active{transform:scale(.96)}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:90}
+#toast{position:fixed;left:50%;top:calc(18px + env(safe-area-inset-top,0px));transform:translate(-50%,-250%);opacity:0;pointer-events:none;background:var(--fg);color:var(--bg);padding:10px 20px;border-radius:999px;z-index:95;transition:transform .35s,opacity .35s;max-width:90vw;text-align:center}
+#toast.show{transform:translate(-50%,0);opacity:1}
+
+#momFlash{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;background:#000;pointer-events:none}
+#momFlash.active{display:flex}
+#momFlash img{width:100%;height:100%;object-fit:cover}
+
+#toast.cat{display:flex;flex-direction:column;align-items:stretch;gap:9px;width:248px;max-width:92vw;padding:14px;border-radius:18px;white-space:normal;text-align:center}#toast.cat img{display:block;width:100%;height:auto;aspect-ratio:22/15;object-fit:cover;border-radius:10px;background:rgba(127,127,127,.14)}#toast.cat .cat-copy{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}#toast.cat .cat-copy strong{font-size:1rem}#toast.cat .cat-copy span{font-size:.82rem;opacity:.72}
+/* opener */
+#s0{display:none;place-items:center;padding:20px}#s0.on{display:grid}
+.note{width:min(380px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;text-align:center}
+.note p{margin:6px 0 16px;color:var(--mute)}
+/* discord dm */
+#s1.on{display:grid;place-items:center;padding:16px}
+.dm{position:relative;width:min(390px,100%);height:min(820px,calc(100vh - 32px));display:flex;flex-direction:column;background:#17171b;border:10px solid #000;border-radius:52px;box-shadow:0 0 0 2px #3a3a42,0 30px 80px #000;overflow:hidden}
+.sb{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 24px 4px;font-weight:600;font-size:.85rem;background:#17171b}
+.sb span{display:flex;align-items:center;gap:5px}
+.nt{position:absolute;top:0;left:50%;transform:translateX(-50%);width:150px;height:26px;background:#000;border-radius:0 0 18px 18px;z-index:3}
+.hi{flex:none;width:130px;height:5px;border-radius:3px;background:#fff;margin:4px auto 8px}
+.dm header{padding:14px 18px;border-bottom:1px solid var(--line);font-weight:600}
+#log{flex:1;min-height:0;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:12px;animation:in .3s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.av{flex:none;width:42px;height:42px;border-radius:50%;background:#2a2a31 center/cover;display:grid;place-items:center;font-weight:700}
+.av.him{background-color:var(--orange);color:#1a1000}.av.her{background-color:var(--orchid);color:#1a0030}
+.nm{font-weight:600}.him .nm,.nm.him{color:var(--orange)}.nm.her{color:var(--orchid)}
+.tm{color:var(--mute);font-size:.75rem;margin-left:8px;font-weight:400}
+.rx{margin-top:6px;display:flex;gap:6px;align-items:center}
+.rxb{border:1px dashed var(--pink);background:none;border-radius:999px;padding:3px 12px;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px #ff7eb633}}
+.chip{border:1px solid var(--orchid);background:#b57bff22;border-radius:8px;padding:1px 9px}
+.day{align-self:center;color:var(--mute);font-size:.8rem;border-top:1px solid var(--line);width:100%;text-align:center;line-height:0;margin:6px 0}
+.day span{background:#17171b;padding:0 10px}
+#tb{height:26px;padding:0 18px;color:var(--mute);font-size:.85rem}
+#bar{display:flex;gap:8px;padding:12px 18px 18px}
+#bar input{flex:1;min-width:0;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:#0f0f12;color:var(--fg);font:inherit}
+#bar.shake{animation:sh .4s}@keyframes sh{25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}
+/* clips */
+#s2{position:relative;background:#000;overflow:hidden;height:100vh}
+.layer{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease;display:grid;place-items:center}
+.layer.on{opacity:1}
+.layer video,.layer img{width:100%;height:100%;object-fit:contain}
+.ph{width:min(520px,84%);aspect-ratio:16/9;border:1px dashed var(--line);border-radius:14px;display:grid;place-items:center;color:var(--mute);text-align:center;padding:20px;background:var(--card)}
+#cap{position:absolute;left:0;right:0;bottom:calc(30px + env(safe-area-inset-bottom,0px));text-align:center;text-shadow:0 2px 10px #000;z-index:2;padding:0 16px}
+.ctl{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));z-index:3;border:1px solid var(--line);background:#000a;border-radius:999px;padding:6px 14px}
+#skip{right:14px}#mute{left:14px}
+/* hub */
+main{max-width:720px;margin:0 auto;padding:0 18px calc(210px + env(safe-area-inset-bottom,0px))}
+.hero{text-align:center;padding:44px 0 24px}
+.cat{width:140px;cursor:pointer;transition:transform .2s}.cat:active{transform:scale(.92) rotate(-4deg)}
+.eye{animation:blink 5s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.hero h2{font-size:clamp(2.4rem,9vw,4rem);line-height:1.05;margin:10px 0 6px}
+.hero h2 span{cursor:pointer;border-bottom:3px solid var(--pink)}
+#count{display:inline-block;margin-top:16px;padding:9px 20px;border:1px solid var(--fg);border-radius:999px}
+h3{font-size:1.5rem;margin:52px 0 14px}
+.ach{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.ach li{padding:13px 16px;border-radius:12px;background:var(--card);border:1px solid var(--line);display:flex;gap:12px;cursor:pointer;transition:.25s}
+.ach li::before{content:"🔒"}.ach li.on{background:var(--fg);color:var(--bg)}.ach li.on::before{content:"🏆"}
+.keys{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.keys button{height:92px;border:0;border-radius:0 0 12px 12px;background:var(--fg);color:var(--bg);font-weight:600;transition:.08s}
+.keys button:nth-child(even){background:#8d8a96}.keys button.p{background:var(--pink);transform:translateY(4px)}
+.sm{color:var(--mute);font-size:.9rem;margin-top:8px}
+.cake{text-align:center}.cake button{background:none;border:0}
+.flame{transform-box:fill-box;transform-origin:50% 100%;animation:fl .4s infinite alternate}@keyframes fl{to{transform:scale(1.15,.9)}}
+.out .flame{display:none}
+.big{text-align:center;margin-top:60px;padding:34px 18px;border:1px solid var(--fg);border-radius:20px}
+.big .btn{font-size:1.1rem;animation:pulse2 2s infinite}@keyframes pulse2{50%{box-shadow:0 0 0 10px #ffffff22}}
+footer{text-align:center;color:var(--mute);padding:36px 0}footer span{cursor:pointer;color:var(--pink)}
+#eggs{position:fixed;right:14px;top:calc(14px + env(safe-area-inset-top,0px));background:var(--card);border:1px solid var(--fg);border-radius:999px;padding:5px 14px;font-size:.9rem;z-index:40}
+/* essay */
+#essay{position:fixed;inset:0;background:#000;z-index:70;overflow-y:auto;visibility:hidden;clip-path:circle(0 at 50% 50%);transition:clip-path 1.3s cubic-bezier(.7,0,.2,1),visibility 0s 1.3s;padding:calc(70px + env(safe-area-inset-top,0px)) 22px calc(230px + env(safe-area-inset-bottom,0px))}
+#essay.open{visibility:visible;transition:clip-path 1.3s cubic-bezier(.7,0,.2,1)}
+.sheet{max-width:560px;margin:0 auto;font-family:Georgia,"Times New Roman",serif;font-size:1.15rem;line-height:1.85}
+.sheet h4{font:400 clamp(2.4rem,10vw,4rem)/1 Georgia,serif;margin:0 0 34px;letter-spacing:-1px}
+.sheet p{margin:0 0 26px;opacity:0;filter:blur(10px);transform:translateY(22px);transition:opacity 1.4s,filter 1.4s,transform 1.4s}
+.sheet p.in{opacity:1;filter:none;transform:none}
+#back{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:14px;z-index:72;border:1px solid var(--line);background:#000;border-radius:999px;padding:6px 14px}
+#rd{display:block;margin:20px auto 0;animation:in .8s}
+/* finale */
+#s4{background:#000;text-align:center}
+#s4.on{display:grid;place-items:center;padding:36px 20px calc(50px + env(safe-area-inset-bottom,0px))}
+.fin{width:100%;max-width:520px}
+.fin h1{font:700 clamp(2.6rem,11vw,4.6rem)/1.02 "Fredoka","Nunito","Trebuchet MS",system-ui,sans-serif;margin:0 0 16px;letter-spacing:-1px}
+.fin>p{font:italic 1.25rem/1.6 Georgia,"Times New Roman",serif;color:var(--mute);margin:0 auto;max-width:30ch}
+.jamc{width:min(380px,100%);margin:30px auto 0;background:linear-gradient(#202026,#0b0b0d);border:1px solid var(--line);border-radius:22px;padding:20px;text-align:left}
+.finv{text-align:center}.jt{font-size:1.15rem;font-weight:600;margin:12px 0 2px}.finv .sm{margin:0 0 14px}
+.avs.avl{justify-content:center}.avs.avl .jav{width:52px;height:52px}.avs.avl .jav+.jav{margin-left:-12px}
+.jh{display:flex;justify-content:space-between;color:var(--mute);font-size:.8rem;margin-bottom:12px}
+.art{margin:14px 0 8px}.art .pair{display:flex;justify-content:center;align-items:flex-end;border-bottom:3px solid #fff3;max-width:300px;margin:0 auto}
+.art .pair svg{width:100px;margin:0 -6px -2px}.art img.cats{display:block;max-width:100%;border-radius:12px;margin:0 auto}
+.ttl{font-size:1.3rem;margin:6px 0 0}.jamc .sm.l{margin:0;text-align:left}
+.fct{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:6px}
+.ib.lg{width:58px;height:58px}
+.flyr{min-height:3.2em;margin-top:14px;text-align:center;font:italic 1.3rem/1.45 Georgia,"Times New Roman",serif}.flyr span{display:inline-block;animation:in .9s ease-out}
+/* essay hint */
+.hint{font-size:.92rem;line-height:1.45;color:var(--mute);border:1px dashed var(--line);border-radius:12px;padding:10px 14px;margin:-14px 0 30px;font-family:"Fredoka","Nunito","Trebuchet MS",system-ui,sans-serif}
+/* jam dock (lives above every page so the song never stops) */
+.dock{position:fixed;z-index:80;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:420px;margin:0 auto}
+@media (min-width:720px){.dock{left:auto;right:18px;margin:0;width:380px}}
+.dk{background:rgba(22,22,27,.95);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:20px;box-shadow:0 14px 40px #000c;overflow:hidden}
+.inv{display:flex;align-items:center;gap:12px;padding:12px 10px 12px 14px;animation:up .5s cubic-bezier(.2,1.2,.4,1)}
+@keyframes up{from{opacity:0;transform:translateY(34px)}to{opacity:1;transform:none}}
+.invt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
+.invt b{font-size:.95rem}.invt span{color:var(--mute);font-size:.8rem}
+.avs{display:flex;flex:none}
+.jav{flex:none;width:38px;height:38px;border-radius:50%;background:#2a2a31 center/cover;border:2px solid #1db954}
+.jav+.jav{margin-left:-11px}
+.btn.gr{background:#1db954;color:#000}.btn.gr:hover{background:#4ade80}
+.btn.sm{padding:9px 18px;font-size:.92rem}
+.ib{flex:none;width:40px;height:40px;border-radius:50%;border:0;background:none;display:grid;place-items:center;padding:0}
+.ib:hover{background:#ffffff1a}.ib:disabled{opacity:.35;cursor:default;background:none}
+.ib.go{background:#1db954;color:#000}.ib.go:hover{background:#4ade80}
+.bell{display:flex;align-items:center;gap:9px;margin-left:auto;position:relative;background:rgba(22,22,27,.95);border:1px solid var(--line);border-radius:999px;padding:9px 16px 9px 12px;box-shadow:0 10px 30px #000b;animation:up .4s}
+.bell .dot{position:absolute;top:5px;left:25px;width:10px;height:10px;border-radius:50%;background:#ff4d6d;border:2px solid #16161b;animation:pulse 1.6s infinite}
+.prow{display:flex;align-items:center;gap:6px;padding:10px 6px 10px 12px}.prow .jav{width:32px;height:32px}.prow .jav+.jav{margin-left:-9px}.prow .ib{width:38px;height:38px}
+.pt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25;padding-left:4px}
+.pt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.97rem}
+.pt span{color:var(--mute);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pt span.wrap{white-space:normal}
+#lyr{box-sizing:border-box;display:flex;align-items:center;justify-content:center;height:3.8rem;min-height:3.8rem;max-height:3.8rem;overflow:hidden;padding:4px 16px;font:italic 1rem/1.25 Georgia,serif;text-align:center;transition:height .65s cubic-bezier(.22,1,.36,1),min-height .65s cubic-bezier(.22,1,.36,1),max-height .65s cubic-bezier(.22,1,.36,1),font-size .65s ease} .open #lyr{height:4.4rem;min-height:4.4rem;max-height:4.4rem;padding:4px 16px;font-size:1.25rem}#lyr span,#flyr span{display:inline-block;max-width:100%;opacity:0;transition:opacity .35s ease,font-size .2s ease;will-change:opacity,font-size}
+.more{padding:0 16px;border-top:1px solid var(--line);max-height:0;opacity:0;overflow:hidden;transform:translateY(-8px);transition:max-height .7s cubic-bezier(.22,1,.36,1),opacity .5s ease,transform .7s cubic-bezier(.22,1,.36,1),padding .7s cubic-bezier(.22,1,.36,1)}
+.more.expanded{max-height:230px;opacity:1;transform:translateY(0);padding:0 16px 14px}
+.seek,.vrow{display:flex;align-items:center;gap:10px;margin-top:12px;color:var(--mute);font-size:.78rem}
+.vrow svg{flex:none}
+input[type=range]{flex:1;min-width:0;accent-color:#1db954;height:24px;margin:0}
+.trow{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:6px}
+#hb{font-size:1.5rem}
+.sm{color:var(--mute);font-size:.9rem;margin-top:8px}
+.more .sm{margin:6px 0 0;text-align:center;font-size:.8rem}
+.prog{height:3px;background:#ffffff26}.prog i{display:block;height:100%;width:0;background:#1db954}
+
+/* Fade only the existing outer pink ring while the jam is paused. */
+@keyframes playRingFade{
+  0%,100%{outline-color:transparent}
+  50%{outline-color:var(--hover)}
+}
+#pp.paused-heartbeat,#fpp.paused-heartbeat{
+  outline:3px solid transparent;
+  outline-offset:3px;
+  animation:playRingFade 1.4s ease-in-out infinite;
+}
+
+/* Match the keyboard-focus accent ring on hover */
+:root{--hover:#ff7eb6}
+
+/* Smoothly fade the accent ring in and out */
+#open,#send,#eo,#rd,#join,#fjoin,#mute,#skip,#back,
+.ach li,.ib:not(:disabled),#heart,#vol{
+  outline:3px solid transparent;
+  outline-offset:3px;
+  transition:outline-color .45s ease, box-shadow .45s ease, transform .45s ease;
+}
+
+/* Keep each control's normal fill; add only an outer pink ring */
+.btn:hover{background:var(--fg)}
+.btn.gr:hover{background:#1db954}
+#open:hover,#send:hover,#eo:hover,#rd:hover,#join:hover,#fjoin:hover,
+#mute:hover,#skip:hover,#back:hover,
+.ach li:hover,
+.ib:not(:disabled):hover,
+#heart:hover{
+  outline:3px solid var(--hover);
+  outline-offset:3px;
+}
+.ach li:hover{background:var(--card);border-color:var(--line);color:var(--fg)}
+.ach li.on:hover{background:var(--fg);border-color:var(--line);color:var(--bg)}
+.ib:not(:disabled):hover{background:none;color:inherit}
+.ib.go:not(:disabled):hover{background:#1db954;color:inherit}
+#mute:hover,#skip:hover,#back:hover{background:#000a;border-color:var(--line);color:inherit}
+#heart:hover{background:transparent;text-shadow:0 0 12px var(--hover);transform:scale(1.12)}
+#vol:hover{outline:3px solid var(--hover);outline-offset:3px;border-radius:999px}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="toast" role="status"></div>
+<div id="momFlash" aria-hidden="true"><img id="momFlashImage" src="images/urmom.gif" alt=""></div>
+<audio id="momFlashSound" src="media/urmom.mp3" preload="auto"></audio>
+
+<section class="stage on" id="s0">
+  <div class="note"><div style="font-size:2.2rem">💬</div><b>1 new message</b><p>from Milis</p><button class="btn" id="open">Open</button></div>
+</section>
+
+<section class="stage" id="s1">
+  <div class="dm">
+    <div class="sb"><span id="clk">9:41</span><span>5G <svg width="18" height="11" viewBox="0 0 18 11" aria-hidden="true"><rect x="0" y="7" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5" width="3" height="6" rx="1" fill="#fff"/><rect x="10" y="2.5" width="3" height="8.5" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#fff"/></svg><svg width="27" height="12" viewBox="0 0 27 12" aria-label="Battery full"><rect x=".5" y=".5" width="22" height="11" rx="3.5" fill="none" stroke="#fff" opacity=".5"/><rect x="2" y="2" width="19" height="8" rx="2" fill="#fff"/><path d="M24 4v4c1-.3 1.8-1.1 1.8-2S25 4.3 24 4z" fill="#fff" opacity=".5"/></svg></span></div><i class="nt"></i>
+    <header>@ Milis</header>
+    <div id="log"></div><div id="tb"></div>
+    <form id="bar" class="hidden" onsubmit="return false"><input id="in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Message Milis" aria-label="Your reply"><button class="btn" id="send" type="button">Send</button></form><div class="hi"></div>
+  </div>
+</section>
+
+<section class="stage" id="s2">
+  <div class="layer" id="la"></div><div class="layer" id="lb"></div>
+  <div id="cap"></div><button class="ctl" id="mute" aria-label="Mute">🔊</button><button class="ctl" id="skip">skip</button>
+</section>
+
+<section class="stage" id="s3"><main>
+  <div class="hero">
+    <svg class="cat" id="oc" viewBox="0 0 120 110" role="img" aria-label="An orange cat. Tap it."><path d="M18 8l22 22H80L102 8v46c0 34-20 50-42 50S18 88 18 54z" fill="#ff9a3c" stroke="#fff" stroke-width="2"/><path d="M26 20l10 10H26zM94 20L84 30h10z" fill="#ff7eb6"/><path d="M60 28v14M48 30l3 11M72 30l-3 11" stroke="#c8661a" stroke-width="4" stroke-linecap="round"/><ellipse class="eye" cx="43" cy="56" rx="8" ry="10" fill="#fff"/><ellipse class="eye" cx="77" cy="56" rx="8" ry="10" fill="#fff"/><ellipse cx="43" cy="57" rx="4.5" ry="6" fill="#222"/><ellipse cx="77" cy="57" rx="4.5" ry="6" fill="#222"/><ellipse cx="60" cy="80" rx="16" ry="11" fill="#ffe3c7"/><path d="M56 72h8l-4 5z" fill="#ff7eb6"/><path d="M60 77q-6 8-13 4M60 77q6 8 13 4" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/></svg>
+    <svg class="cat" id="cat" viewBox="0 0 120 110" role="img" aria-label="A black cat. Tap it."><path d="M18 8l22 22H80L102 8v46c0 34-20 50-42 50S18 88 18 54z" fill="#000" stroke="#fff" stroke-width="2"/><path d="M26 20l10 10H26zM94 20L84 30h10z" fill="#ff7eb6"/><ellipse class="eye" cx="43" cy="56" rx="8" ry="10" fill="#d6ff6b"/><ellipse class="eye" cx="77" cy="56" rx="8" ry="10" fill="#d6ff6b"/><ellipse cx="43" cy="56" rx="2.4" ry="8" fill="#000"/><ellipse cx="77" cy="56" rx="2.4" ry="8" fill="#000"/><path d="M56 72h8l-4 5z" fill="#ff7eb6"/><path d="M60 77q-6 8-13 4M60 77q6 8 13 4" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round"/></svg>
+    <h2>Happy 20th,<br><span id="mon">Monster</span></h2>
+    <div id="count">…</div>
+  </div>
+  <h3>Achievements unlocked</h3>
+  <ul class="ach" id="ach">
+    <li>Has a cat that wakes up and chooses violence</li>
+    <li>Lives with a dog who has beef with the air</li>
+    <li>Owns three pets and somehow all share a single braincell most of the time</li>
+    <li>Has been caught lacking in 4K</li>
+    <li>Has successfully stolen someone's entire attention span</li>
+    <li>Best listener to someone :)</li>
+    <li>Has made doing absolutely nothing a whole activity</li>
+    <li>Has made someone smile at their screen like an idiot</li>
+    <li>Master of getting side tracked, Its SO PEAK THOUGH</li>
+    <li>Has the ability to instantly make someones day better</li>
+    <li>Survived 20 years :)</li>
+  </ul>
+  <p class="sm">Click on them, they're all true :)</p>
+  <h3>Play a song :) (With your immaculate piano skills)</h3>
+  <div class="keys" id="keys" tabindex="0" aria-label="Piano keyboard"></div>
+  <p class="sm">Tap a piano key to enable the keyboard, then use 1 2 3 4 5 6 7 8 to play the notes</p>
+  <h3>Make a wish</h3>
+  <div class="cake"><button id="cake" aria-label="Blow out the candles"><svg viewBox="0 0 200 170" width="240"><rect x="30" y="90" width="140" height="62" rx="12" fill="#fff"/><path d="M30 108q18 16 35 0t35 0 35 0 35 0v-12H30z" fill="#b57bff"/><rect x="30" y="140" width="140" height="12" rx="6" fill="#ff7eb6"/><rect x="76" y="58" width="10" height="32" fill="#8d8a96"/><rect x="114" y="58" width="10" height="32" fill="#8d8a96"/><path class="flame" d="M81 56q-8-10 0-20 8 10 0 20z" fill="#ffd35c"/><path class="flame" d="M119 56q-8-10 0-20 8 10 0 20z" fill="#ffd35c"/></svg></button><p class="sm" id="wish">Click the cake to blow out the candles</p></div>
+  <div class="big"><p style="margin-top:0">One last thing :)</p><button class="btn" id="eo">Open my real message</button></div>
+  <footer>Made with care for someone who was worth every second · <span id="heart" role="button" tabindex="0" aria-label="heart">♥</span></footer>
+</main></section>
+
+<div id="essay"><button id="back">← back</button><div class="sheet" id="sheet"></div></div>
+<div id="eggs" class="hidden">Easter eggs: <b id="n">0</b>/11</div>
+
+<section class="stage" id="s4">
+  <div class="fin">
+    <h1>Happy birthday,<br>Monster</h1>
+    <p id="fmsg"></p>
+    <div class="jamc" id="jamc">
+      <div class="finv" id="finv">
+        <div class="avs avl"><i class="jav him"></i><i class="jav her"></i></div>
+        <p class="jt">Milis invited you to a Jam</p><p class="sm">Happy 20th, Monster</p>
+        <button class="btn gr" id="fjoin">Join the Jam</button>
+      </div>
+      <div class="hidden" id="fpl">
+        <div class="jh"><span>Jam · Happy 20th, Monster</span><span>2 listening</span></div>
+        <div class="avs avl"><i class="jav him"></i><i class="jav her"></i></div>
+        <div class="art" id="fc"></div>
+        <h2 class="ttl" id="fptitle"></h2><p class="sm l" id="fpsub"></p>
+        <div class="seek"><span id="ftc">0:00</span><input type="range" id="fseek" min="0" max="1000" value="0" aria-label="Song position"><span id="ftd">0:00</span></div>
+        <div class="fct"><button class="ib" id="fmutebtn" aria-label="Mute"></button><button class="ib" id="fprev" aria-label="Previous song"></button><button class="ib go lg" id="fpp" aria-label="Pause"></button><button class="ib" id="fnext" aria-label="Next song"></button><button class="ib" id="fhb" aria-label="Like this song" style="font-size:1.5rem">♡</button></div>
+        <div class="vrow" id="fvrow"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z"/></svg><input type="range" id="fvol" min="0" max="100" value="70" aria-label="Volume"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zM14 8.5a4.5 4.5 0 0 1 0 7zM14 4.3a9 9 0 0 1 0 15.4v-2a7 7 0 0 0 0-11.4z"/></svg></div>
+        <p class="sm hidden" id="fvoln" style="text-align:center">Use your phone’s volume buttons to turn it down</p>
+        <p class="sm" id="fupnext" style="text-align:center"></p>
+        <div class="flyr" id="flyr" aria-live="off"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<audio id="song" preload="auto"></audio>
+
+<aside class="dock hidden" id="dock" aria-label="Jam music player">
+  <div class="dk inv hidden" id="inv" role="group" aria-label="Jam invite">
+    <div class="avs"><i class="jav him"></i><i class="jav her"></i></div>
+    <div class="invt"><b>Milis invited you to a Jam</b><span>Happy 20th, Monster</span></div>
+    <button class="btn gr sm" id="join">Join</button>
+    <button class="ib" id="later" aria-label="Not now">✕</button>
+  </div>
+  <button class="bell hidden" id="bell" aria-label="You have a Jam invite from Milis">🔔<i class="dot"></i><span>Jam invite</span></button>
+  <div class="dk hidden" id="pl">
+    <div class="prow">
+      <div class="avs"><i class="jav him"></i><i class="jav her"></i></div>
+      <div class="pt"><b id="ptitle"></b><span id="psub"></span></div>
+      <button class="ib" id="mutebtn" aria-label="Mute"></button>
+      <button class="ib go" id="pp" aria-label="Pause"></button>
+      <button class="ib" id="exp" aria-label="Show volume and more controls" aria-expanded="false"></button>
+    </div>
+    <div id="lyr" aria-live="off"></div>
+    <div class="more hidden" id="more">
+      <div class="vrow" id="vrow"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z"/></svg><input type="range" id="vol" min="0" max="100" value="70" aria-label="Volume"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zM14 8.5a4.5 4.5 0 0 1 0 7zM14 4.3a9 9 0 0 1 0 15.4v-2a7 7 0 0 0 0-11.4z"/></svg></div>
+      <p class="sm hidden" id="voln">Use your phone’s volume buttons to turn it down</p>
+      <div class="seek"><span id="tc">0:00</span><input type="range" id="seek" min="0" max="1000" value="0" aria-label="Song position"><span id="td">0:00</span></div>
+      <div class="trow"><button class="ib" id="prev" aria-label="Previous song"></button><button class="ib" id="hb" aria-label="Like this song">♡</button><button class="ib" id="next" aria-label="Next song"></button></div>
+      <p class="sm" id="upnext"></p>
+    </div>
+    <div class="prog"><i id="fill"></i></div>
+  </div>
+</aside>
+
+<script>
+(function(){
+var CFG={pfpHim:'data:image/jpeg;base64,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',pfpHer:'data:image/jpeg;base64,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',cats:'',songs:[
+  /* Add more songs here. Lyrics use [startSeconds, endSeconds, 'text'].
+     Example: lyrics:[[12,15.5,"first line"],[18,21,"second line"]]
+     They play in this order, and the Jam ends after the last one. */
+  {src:'media/song.mp3', title:'Thinking about you', by:'Milis', lyrics:[
+      [19,29,"I'm asleep in the moment you're holdin' my head"],
+      [37,47,"But I want to remember, I'll sleep when I'm dead"],
+      [54,60,"I'm thinkin' about"],
+      [61,67,"Thinkin' about you"],
+      [73,78,"I'm thinkin' about"],
+      [79,86,"Thinkin' about you"],
+      [93,102,"And you said you were sure it'll work out this time"],
+      [112,121,"Well, I'm holding you to it, I knew you were right"],
+      [128,134,"I'm thinkin' about"],
+      [135,142,"Thinkin' about you"],
+      [147,152,"I'm thinkin' about"],
+      [153,160,"Thinkin' about you"],
+      [203,207,"I'm thinkin' about"],
+      [209,216,"Thinkin' about you"],
+      [221.4, 225.85, "I'm thinkin' about"],
+      [227.47, 234.43, "Thinkin' about you"],
+      [239.86, 244.54, "I'm thinkin' about"],
+      [245.9, 253.35, "Thinkin' about you"],
+      [258.21, 262.96, "I'm thinkin' about"],
+      [264.4, 272.2, "Thinkin' about you"],
+      [276.67, 281.51, "I'm thinkin' about"],
+      [282.82, 290.66, "Thinkin' about you"],
+      [295.31, 299.85, "I'm thinkin' about"],
+      [301.28, 308.78, "Thinkin' about you"],
+      [313.74, 318.28, "I'm thinkin' about"],
+      [319.73, 327.87, "Thinkin' about you"],
+      [332.09, 336.91, "I'm thinkin' about"],
+      [338.21, 345.66, "Thinkin' about you"],
+      [350.53, 355.21, "I'm thinkin' about"],
+      [356.64, 364.62, "Thinkin' about you"],
+      [369.02, 373.73, "I'm thinkin' about"],
+      [375.18, 382.61, "Thinkin' about you"],
+      [388.53, 389.47, "I'm"]
+  ]},
+
+  {src:'media/song2.mp3', title:'Duvet', by:'Milis', lyrics:[
+    [6.86, 11.02, "And you don't seem to understand"],
+    [12.24, 16.11, "A shame you seemed an honest man"],
+    [17.08, 21.29, "And all the fears you hold so dear"],
+    [22.23, 26.48, "Will turn to whisper in your ear"],
+    [27.27, 29.52, "And you know what they say might hurt you"],
+    [30.05, 32.12, "And you know that it means so much"],
+    [32.6, 37.34, "And you don't even feel a thing"],
+    [37.76, 42.71, "I am falling, I am fading"],
+    [43.11, 47.07, "I have lost it all"],
+    [48.06, 53.29, "And you don't seem the lying kind"],
+    [53.68, 57.83, "A shame that I can read your mind"],
+    [58.4, 62.22, "And all the things that I read there"],
+    [63.56, 67.89, "Candlelit smile that we both share"],
+    [68.53, 71.11, "And you know I don't mean to hurt you"],
+    [71.37, 73.64, "But you know that it means so much"],
+    [74.03, 78.08, "And you don't even feel a thing"],
+    [78.85, 86.45, "I am falling, I am fading, I am drowning"],
+    [87.07, 89.28, "Help me to breathe"],
+    [89.33, 94.47, "I am hurting, I have lost it all"],
+    [94.63, 96.59, "I am losing"],
+    [97.09, 101.26, "Help me to breathe"],
+    [140.95, 148.18, "I am falling, I am failing, I am drowning"],
+    [148.67, 150.97, "Help me to breathe"],
+    [151.18, 156.24, "I am hurting, I have lost it all"],
+    [156.6, 158.58, "I am losing"],
+    [158.98, 162.1, "Help me to breathe"],
+    [163.14, 168.56, "Oh-oh, yeah"],
+    [174.04, 180.13, "Oh-oh-oh-oh, yeah"],
+    [182.33, 189.53, "I am falling, I am failing, I am drowning"],
+    [189.92, 192.24, "Help me to breathe"],
+    [192.46, 197.46, "I am hurting, I have lost it all"],
+    [197.75, 199.99, "I am losing"],
+    [200.29, 205.08, "Help me to breathe"]
+  ]},
+
+  {src:'media/song3.mp3', title:'Kingston', by:'Milis', lyrics:[
+    [0.29, 6.4, "The day that I met you, I started dreaming"],
+    [7.4, 13.39, "Now I write 'em down if I remember in the morning time"],
+    [13.94, 19.96, "I don't know that much about Kingston"],
+    [20.81, 27.18, "But I like the sound it makes when it starts pouring rain"],
+    [27.6, 32.93, "I think that tonight I'll leave my light on"],
+    [34.27, 40.8, "'Cause I get lonely when it's out and I miss you right about now"],
+    [54.74, 60.57, "Baby, tell me where you wanna go"],
+    [61.41, 67.28, "Baby, tell me what you wanna know"],
+    [68.14, 74.48, "Give you everything I have and more"],
+    [85.3, 90.92, "He said, \"baby, \" that's what he called me, \"I love you\""],
+    [91.96, 98.15, "Every single word you say makes me feel some type of way"],
+    [98.58, 104.19, "It's the thought of you that slightly scares me"],
+    [105.32, 111.67, "But it takes my breath away, forget what I was gonna say"],
+    [112.08, 118.24, "The day that I met you, I started dreaming"],
+    [118.75, 125.17, "Now I write 'em down if I remember in the morning time"],
+    [139.17, 144.82, "Baby, tell me where you want to go"],
+    [145.89, 151.6, "Baby, tell me what you wanna know"],
+    [152.66, 158.51, "Give you everything I have and more"],
+    [159.38, 165.22, "Baby, tell me where you wanna go"],
+    [166.27, 172.08, "Baby, tell me what you wanna know"],
+    [173, 178.84, "Give you everything I have and more"],
+    [179.79, 185.48, "Baby, tell me where you wanna go"],
+    [186.47, 192.36, "Baby, tell me what you wanna know"],
+    [193.24, 199.11, "Give you everything I have and more"]
+  ]},
+
+  {src:'media/song4.mp3', title:'Who knows', by:'Milis', lyrics:[
+    [0.36, 6.46, "I'll probably be a waste of your time, but who knows?"],
+    [8.83, 13.9, "Chances are I'll step out of line, but who knows?"],
+    [16.81, 19.52, "Lately, you've set up in my mind"],
+    [19.88, 31.62, "Yeah, girl, you, and I like that, ooh"],
+    [32.7, 39.61, "Lately, I've been thinking that perhaps I am a coward"],
+    [40.52, 48.19, "Hiding in a disguise of an ever-giving flower"],
+    [48.61, 55.43, "Incompetent steward of all of that sweet, sweet power"],
+    [64.56, 69.71, "Yesterday was feeling so good, now it's gone"],
+    [72.31, 77.27, "I'd feel like that always if I could, is that wrong?"],
+    [80.33, 82.85, "Tell me 'bout the city you're from"],
+    [83.38, 87.22, "Is it hot? Does it snow there?"],
+    [96.18, 103.22, "Lately, I've been thinking 'bout my precarious future"],
+    [104.14, 110.93, "Will you be there with me by my side, my girl, my shooter?"],
+    [112.1, 118.89, "Who's to say who calculates? Not me, I'm no computer"],
+    [127.56, 132.15, "Is it a crime to be unsure?"],
+    [133.49, 141.72, "In time, we'll find if it's sustainable)"],
+    [143.39, 150.65, "You're pure, you're kind, mature, divine"],
+    [151.18, 157.03, "You might be too good for me, unattainable"],
+    [191.55, 196.92, "Maybe we get married one day, but who knows?"],
+    [199.3, 204.27, "Think I'll take that thought to the grave, but who knows?"],
+    [207.2, 209.87, "I know that I'll love you always"],
+    [210.25, 214.43, "Yeah, girl, you, and I'd like that"]
+  ]},
+
+  {src:'media/song5.mp3', title:'Sweet Boy', by:'Milis', lyrics:[
+    [0.34, 2.45, "One, two, three, four"],
+    [2.91, 5.5, "Can we go home now?"],
+    [6.03, 8.05, "It's getting later, baby"],
+    [8.66, 10.9, "Can we go home now?"],
+    [11.32, 13.85, "You think it's time to give up"],
+    [14.18, 16.28, "We're on our own now"],
+    [16.68, 18.96, "No place to drive you crazy"],
+    [19.51, 21.59, "Don't share a home now"],
+    [21.98, 24.34, "I'm okay 'til tonight"],
+    [26.16, 28.37, "Ties get broken"],
+    [28.87, 35.82, "You need space and you're not mad when I'm not late"],
+    [36.81, 41.08, "Now I'm not there and you're just fine"],
+    [41.9, 46.19, "But I'm okay 'til tonight"],
+    [47.88, 49.96, "I want you to go"],
+    [50.65, 52.75, "I wrote it in bold"],
+    [53.18, 55.62, "Yeah, I got a plan"],
+    [55.91, 58.36, "And you can't be involved"],
+    [58.69, 60.9, "And when it gets great"],
+    [61.33, 63.51, "Don't start to get mad"],
+    [63.87, 65.52, "'Cause I'ma lose time"],
+    [66.58, 68.42, "When you are free to have"],
+    [70.12, 71.59, "Fly out to the city"],
+    [71.85, 73.25, "They're throwing some money at me"],
+    [73.47, 74.46, "I know it's been shitty"],
+    [74.64, 75.89, "To see the attention I'm getting"],
+    [76.11, 77.21, "But it's been coming"],
+    [77.41, 78.54, "Since I've been singing, baby"],
+    [78.77, 79.7, "(Singing, baby)"],
+    [80.96, 83.94, "Now I'll just see you when I'm on business"],
+    [84.17, 86.14, "With everyone you can listen"],
+    [86.73, 89.89, "You can write me from where you are living"],
+    [90.14, 92.27, "Can we go home now?"],
+    [92.93, 95.55, "It's getting later, baby"],
+    [95.95, 98.28, "Can we go home now?"],
+    [98.63, 100.97, "You think it's time to give up"],
+    [101.4, 103.77, "We're on our own now"],
+    [104.11, 106.46, "No place to drive you crazy"],
+    [106.82, 108.88, "Don't share a home now"],
+    [109.54, 111.98, "I'm okay 'til tonight"],
+    [113.32, 118.16, "Ties get broken, you need space"],
+    [118.54, 121.18, "And you're not mad when"],
+    [121.49, 123.96, "I'm not late now"],
+    [124.28, 129.09, "I'm not there and you're just fine"],
+    [129.61, 133.81, "But I'm okay 'til tonight"]
+  ]}
+ ],
+ finalMsg:'Twenty looks good on you, Thank you for being exactly who you are, Toodaloo :)',
+ clips:[
+    {type:'video', src:'media/clip.mp4', d:5, cap:'Heh'},
+    {type:'video', src:'media/clip1.mp4', d:13, cap:'kaboom'},
+    {type:'video', src:'media/clip2.mp4', d:9, cap:'Cookies'},
+    {type:'video', src:'media/clip4.mp4', d:12, cap:'HEH SLURPPP'},
+    {type:'video', src:'media/clip5.mp4', d:7, cap:'"Yoo are we tweaking out"'},
+    {type:'video', src:'media/clip6.mp4', d:17, cap:'1, 2, 3, 4'},
+    {type:'video', src:'media/clip7.mp4', d:7, cap:'Locked in'},
+    {type:'video', src:'media/clip8.mp4', d:10, cap:'Tasty'},
+    {type:'video', src:'media/clip9.mp4', d:15, cap:'Ur mom'},
+    {type:'video', src:'media/clip10.mp4', d:7, cap:'"Whered you g"'},
+    {type:'video', src:'media/clip11.mp4', d:15, cap:'OUI SHII'},
+    {type:'video', src:'media/clip12.mp4', d:19, cap:'Taser Taster'},
+    {type:'video', src:'media/clip13.mp4', d:8, cap:'SO peak'},
+    {type:'video', src:'media/clip14.mp4', d:5, cap:'PEAK LAUGH'},
+    {type:'video', src:'media/clip15.mp4', d:7, cap:'YIPEEE'},
+    {type:'video', src:'media/clip16.mp4', d:50, cap:'HEH little do you know Id like that'},
+    {type:'video', src:'media/clip17.mp4', d:35, cap:'Very special Milis'},
+    {type:'video', src:'media/clip18.mp4', d:5, cap:'My names jeff Ik you arent there sighhh but but I wanted to add it anyways to make you laugh hopefully :D'},
+    {type:'video', src:'media/clip19.mp4', d:15, cap:'Spelling your name I see, heh'},
+    {type:'video', src:'media/clip20.mp4', d:25, cap:'Little does she know'},
+  ], /* {type:'video'|'img', src:'', t0:0, d:8, cap:''} */
+ lyrics:[], /* per-song lyric lines: [startSeconds,endSeconds,"line"]. Use double quotes around lyric text so apostrophes work, e.g. "I'm here". */
+ essay: [
+      `Well, get ready for a lot of reading :), I have some things I’d like to say, not a ton, nothing crazy, but still something :)`,
+
+      `Happy 20th birthday :), Hopefully I’ll be there for many more, I don’t plan on going anywhere as long as you want me to stay :), also 20 years old, thats not that old at all, you are just beginning a new chapter in your life, anything could happen in the next year (you moving in with your sister, moving somewhere new by yourself, meeting someone, lots of things) :), you still have a lot more life to live, hopefully with me in it in some way shape or form, (IF you want)`,
+
+      `I wanted to thank you for being so understanding and always being willing to have a convo with me about literally anything, it can be something really unique, random thoughts, legit whatever comes to our mind in the moment (heh each other), or something deep/bothering me, and you always treat those convos extremely mature, yk apart from the heh ones but yk those ones, heh shhhhh :), ANYWAYS Lwk so I was debating writing out like a full perfectly drafted message, but I wanted to make it more personal and less of like yk making this sound like a business email sooo :D`,
+
+      `First of all, you’ve been extremely kind to me and overall pretty much like in my mind, a pretty perfect person if I do say myself, and I know you'll be like well im actually NOT perfect but sometimes perfection isn’t about knowing something perfect, its something managing to have a perfect balance of all the right things :), I have enjoyed every moment with you since we met, and I look forward to many many many many many many many many (so on) more moments like that :), I don’t care how many hard times or bad times the future might hold, in the end it will be worth it, I know it, in the end its worth it, it always is, and will be :)`,
+
+      `I want to make sure that nothing small gets in the way of what we have, I don’t physically care how small something is, if it bothers you,it bothers you, and I care, so if there's anything, and I mean ANYTHING at all, especially if its about me. Also the thing about voice messages, like when u send me one, ts MMMM ITS SO PEAK, LIKE ITS SO SO SO SO SO PEAK :D Ts like MMMMMM anyways I THINK you might know that, just maybe :)`,
+
+      `I wanted to say that like, all the small little things like you sending a link to a jam, or being willing to do a jam instead of watching yt, or the little things like sending a vm instead of just typing something, and yk also like when you take the time to ask me how Im doing or small things like that, its so peak everytime you ask I smile :), ooui also like buying matching fits and all those small things, Okay ONE LAST SMALL THING YOU DO is when you take the time to tell me like your going afk, or busy, or going to do/grab something, or even just like randomly being like Im at this store now, or Im eating this, laying here, that stuff :) very very very peak :), I could go on and on about a BUNCH more small things but you know what I mean, all those small things, do not go unnoticed by any means, trust me`,
+
+      `I greatly appreciate being able to have you in my life, you bring another sense of joy to my life that others can’t seem to bring, also I don’t feel that lonely anymore which is very peak :) You’ve managed to bring back a part of me I thought was lost, I want you to know, that I am extremely extremely grateful and honored to be lucky enough to have met you, all of this wouldn’t have happened if I didn’t meet Xinxie, which is crazy to me because I don’t even know what my life would be like right now without you, you are responsible for all those things`,
+
+      `You bring a certain light into my life that no one has been able to, and its very peak, and I hope that light stays for many years and hopefully gets brighter :), I look forward greatly to hopefully, many many more years :)`,
+
+      `Also with this message, Im not trying to do one super response saying EVERYTHING because that would be, way way too much, trust me, and would take days :), just know that I have extremely thankful, and grateful for you, I sometimes think I don’t deserve someone like you in my life, you are so peak :)`,
+
+      `I think I’ve probably repeated myself like, a bunch of times… but uhm treat me repeating myself as like it being important to me (Not saying the stuff I didn’t repeat isn’t important, they are all very important) :)`,
+
+      `Mkay so this I wrote today, I’ve been writing this over a few days as well as working on this project and its all kind of jumbled around in my mind,`,
+
+      `First of all, you are an amazing person, from all the things you’ve told me about and all the things you’ve been through in your life you still manage to keep going and bring a positive light into my life as well as others, you are extremely caring and always go above and beyond my expectations as well as the expectations of others, even if they don’t deserve the kind gestures you are offering them.`,
+
+      `Secondly, I am so lucky to have you in my life, over the years I’ve been wishing for someone exactly like you to come into my life, and that day has came :), its so peak, I really do appreciate you a ton, and all the things you do and talk about, and do for me is very peak, even if I don’t do a ton in return. You’ve helped me in many ways, I'm not going to list them, but just know, you have made a huge positive impact on my life`,
+
+      `Mmmm this First of all and secondly thing is turning ts into like an essay… uhmmmm uhhhh shhh, so like I coulddd talk about like yk how much I adore you talking and like yk how peak u look and like yk other stuff but mmm consider me saying I’d consider saying it, me saying it :D (Im so slow rn…)`,
+
+      `Lastly, (not lastly, but like I deadass gonna force myself to stop talking and yeah I’ll yk do my little vm things every once and awhile appreciating you)`,
+
+      `OOOUI WAIT I GOT MORE TO TALK ABOUT (11:39 PM my time, uhhh 1:39 ur time… yooooooo)`,
+
+      `Also, I wanted to mention how comfortable you've made me feel, like I don't really feel the need to constantly think about what I'm saying or how I'm saying it, I can just be myself, and that's something I genuinely appreciate a ton. I can be incredibly random, say the most out of pocket things, talk about the most specific little thoughts that come into my mind, and you just go along with it :), and I hope you know that you can do the exact same with me, you don't ever have to feel like you need to filter/moderate yourself or worry about being too much, because I genuinely enjoy hearing about literally anything that comes to your mind, even if it's something you think is completely uninteresting or random, I WANT TO HEAR IT, trust me :D, OUI OR IF ITS REALLY FREAKY HEH`,
+
+      `Another mhm mhm ANOTHER one very surprising, thing is I don't think I mention enough is how much I genuinely enjoy learning little things about you, whether it's something about your day, something you like, something you dislike, some random little detail about your life. I like getting to know you more and more, and I don't think that feeling is going to go away anytime soon :) (its NEVER leaving), I want to know about the little things just as much as the big things, because they're all parts of you, and I genuinely enjoy getting to know every little part of you that you're comfortable sharing with me :D (And comfortable also means you wont overthink it at all)`,
+
+      `And I hope you know that you don't always have to be the positive, happy, caring person that everyone gets to see, you can have bad days, you can be upset, you can be frustrated, you can overthink things, you can literally just not feel like doing anything, and that's completely okay. I don't expect you to always be doing amazing, nor do I expect you to always have the energy to talk or do things, you're a person too, and you deserve to have someone who listens to you just as much as you listen to them. I want to be someone you can come to with literally anything, without feeling like you're bothering me or being a burden, because you're not, not even a little bit :).`,
+
+      `I hope you know that you don’t always have to be positive, happy, pretend that everything is okay or a caring person that everyone gets to see, you can be, you can have bad days, you can be upset, you can be frustrated, you can overthink things, you can literally just not feel like doing anything, and that's completely okay. I don't expect you to always be doing amazing, nor do I expect you to always have the energy to talk or do things, you're a person too, and you deserve to have someone who listens to you just as much as you listen to them. I want to be someone you can come to with literally anything, without feeling like you're bothering me or being a burden, because you're not, not even a little bit :)`,
+
+      `Yk what else I really like? It's how even the most ordinary things can become something I look forward to when it's with you, like genuinely, we could be doing absolutely nothing crazy, just sitting there, talking about random things, listening to music, or whatever else (NOT SAYING THESE THINGS AREN’T PEAK), and I'd still be enjoying myself a ton. It doesn't always have to be some big planned activity or something particularly exciting, sometimes just having you there is enough, and I think that's something really special. I don't think you necessarily realize how much happiness you can bring me just by being yourself and doing the little things you do :), it's very very very peak.`,
+
+      `ANYWAYS, I think I'm finally going to stop writing before this turns into an entire book (although trust me, I could probably keep going for another 20 pages :D), but I really do hope you understand just how much you mean to me and how grateful I am to have you in my life. I hope you have the most amazing birthday, and that this next year brings you so many good things, because you genuinely deserve all of them and more. I hope I get to be there for many more birthdays, many more random conversations, many more little moments, and all the other things that life has yet to bring us. I don't know exactly what the future holds, and I don't think either of us does, but I do know that I'd love to continue being a part of yours, for as long as you'll have me :), Thank you for being you, thank you for everything you've done, and thank you for being someone I can genuinely say has made my life so much better. I appreciate you more than I could ever properly put into words, and I hope I can continue showing you that, not just through messages like this, but through all the little things I do. HAPPY 20TH BIRTHDAYYYYY :D`
+    ]};
+var inviteTimer;var $=function(s){return document.querySelector(s)},wait=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
+var T=$('#toast'),tt;function toast(m){T.classList.remove('cat');T.textContent=m;T.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){T.classList.remove('show')},2600)}
+function catNotice(which){var data={milis:{name:'Milis',src:'images/milis.png'},monster:{name:'Monster',src:'images/monster.png'},together:{name:'Milis & Monster',src:'images/together.png'}}[which];if(!data)return;var eggNames={milis:'Milis spotted :D',monster:'Monster spotted :)',together:'The duo has been found :)'};egg('photo-'+which,eggNames[which],false);clearTimeout(tt);T.classList.add('cat');T.innerHTML='<div class="cat-copy"><strong>'+data.name+'</strong><span>Found a little surprise</span></div><img alt="'+data.name+' photo placeholder" src="'+data.src+'">';var img=T.querySelector('img');img.onerror=function(){this.removeAttribute('src');this.alt='Add your image at '+data.src};T.classList.add('show');tt=setTimeout(function(){T.classList.remove('show')},4200)}
+/* confetti */
+var cv=$('#fx'),cx=cv.getContext('2d'),P=[],run=false;
+function size(){cv.width=innerWidth;cv.height=innerHeight}size();addEventListener('resize',size);
+function boom(x,y,n){x=x==null?innerWidth/2:x;y=y==null?innerHeight/3:y;var c=['#b57bff','#ff7eb6','#fff','#a9a6b3','#ff9a3c'];for(var i=0;i<(n||120);i++)P.push({x:x,y:y,vx:(Math.random()-.5)*12,vy:Math.random()*-12-2,r:Math.random()*6+3,c:c[i%5],l:120});if(!run){run=true;tick()}}
+function tick(){cx.clearRect(0,0,cv.width,cv.height);P=P.filter(function(p){return p.l>0});P.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.vy+=.3;p.l--;cx.fillStyle=p.c;cx.globalAlpha=Math.min(1,p.l/40);cx.fillRect(p.x,p.y,p.r,p.r*.6)});if(P.length)requestAnimationFrame(tick);else{run=false;cx.clearRect(0,0,cv.width,cv.height)}}
+var AC;function tone(f,d){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.25,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+(d||.6));o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+(d||.6))}catch(e){}}
+/* stage fade */
+function go(id,ms){ms=ms||1200;var c=$('.stage.on');c.style.transition='opacity '+ms+'ms';c.style.opacity=0;setTimeout(function(){c.classList.remove('on');var n=$(id);n.classList.add('on');n.style.opacity=0;void n.offsetWidth;n.style.transition='opacity '+ms+'ms';n.style.opacity=1;scrollTo(0,0);$('#eggs').classList.toggle('hidden',id!=='#s3');if(id==='#s3'&&!inviteTimer)inviteTimer=setTimeout(showInvite,2600)},ms)}
+/* discord dm */
+function clk(){var d=new Date();$('#clk').textContent=(d.getHours()%12||12)+':'+('0'+d.getMinutes()).slice(-2)}clk();setInterval(clk,10000);
+var log=$('#log');
+function msg(who,text){var r=document.createElement('div');r.className='row '+who;var a=document.createElement('div');a.className='av '+who;var p=who==='him'?CFG.pfpHim:CFG.pfpHer;if(p)a.style.backgroundImage='url('+p+')';else a.textContent='M';var b=document.createElement('div');var d=new Date(),t=d.getHours()%12||12,m=('0'+d.getMinutes()).slice(-2);b.innerHTML='<span class="nm '+who+'">'+(who==='him'?'Milis':'Monster')+'</span><span class="tm">Today at '+t+':'+m+'</span><div class="tx"></div>';b.lastChild.textContent=text;r.appendChild(a);r.appendChild(b);log.appendChild(r);log.scrollTop=log.scrollHeight;return b}
+async function typing(ms){$('#tb').textContent='Milis is typing…';await wait(ms);$('#tb').textContent=''}
+$('#open').onclick=async function(){
+ go('#s1',700);await wait(1500);
+ 
+ 
+ 
+ await wait(1400);await typing(2800);
+ var m=msg('him','Thanks for being you Monster, you can’t begin to grasp how much I appreciate you :)');
+ var rx=document.createElement('div');rx.className='rx';rx.innerHTML='<button class="rxb" aria-label="Add a heart reaction">♡ react</button>';m.appendChild(rx);log.scrollTop=log.scrollHeight;
+ await new Promise(function(res){rx.firstChild.onclick=function(){rx.innerHTML='<span class="chip">❤️ 1</span>';tone(660,.2);boom(null,null,60);res()}});
+ await wait(1000);await typing(1900);msg('him','Well, consider this a tiny bit of how much I appreciate you, I hope you enjoy, Toodaloo :)');
+ var bar=$('#bar');bar.classList.remove('hidden');$('#in').focus({preventScroll:true});log.scrollTop=log.scrollHeight;
+ var v;await new Promise(function(res){function ck(){var s=$('#in').value;
+  /* Hidden phone-message trigger: submit either phrase to flash the full screen and play the MP3. */
+  if(/\b(?:ur|your)\s+mom\b/i.test(s)){
+   var flash=$('#momFlash'),audio=$('#momFlashSound');
+   flash.classList.add('active');
+   audio.pause();audio.currentTime=0;var playback=audio.play();if(playback&&playback.catch)playback.catch(function(){});
+   clearTimeout(window.momFlashTimer);window.momFlashTimer=setTimeout(function(){flash.classList.remove('active')},3500);
+   $('#in').value='';return;
+  }
+  var k=s.toLowerCase().replace(/\s/g,'');if(/^(tata|toodles)(:\)|:d|:\(|:p|:3|\)|:-\)|<3)?$/.test(k)){v=s;res()}else{bar.classList.remove('shake');void bar.offsetWidth;bar.classList.add('shake');$('#in').placeholder='Yk yk "_____ :)"'}}
+  $('#send').onclick=ck;$('#in').onkeydown=function(e){if(e.key==='Enter')ck()}});
+ bar.classList.add('hidden');msg('her',v);await wait(1100);await typing(2400);msg('him','Soo peak, Sooo peak, ALSO thanks for being you, I mean it :)');
+ await wait(3600);go('#s2',2200);setTimeout(startClips,2300)};
+/* clips */
+var layers=[$('#la'),$('#lb')],cur=0,ci=0,muted=false,tm,clips=CFG.clips.length?CFG.clips:[{type:'ph',cap:'Clip 1 goes here'},{type:'ph',cap:'Clip 2 goes here'},{type:'ph',cap:'Clip 3 goes here'}];
+function startClips(){ci=0;showClip()}
+function showClip(){var c=clips[ci],L=layers[cur],o=layers[1-cur],el,dur=c.d||(c.type==='video'?8:4);L.innerHTML='';
+ if(c.type==='video'){el=document.createElement('video');el.src=c.src;el.playsInline=true;el.muted=muted;el.onloadedmetadata=function(){if(c.t0)el.currentTime=c.t0};var pr=el.play();if(pr&&pr.catch)pr.catch(function(){el.muted=true;el.play()})}
+ else if(c.type==='img'){el=document.createElement('img');el.src=c.src;el.alt=''}
+ else{el=document.createElement('div');el.className='ph';el.textContent=c.cap;dur=3}
+ L.appendChild(el);void L.offsetWidth;L.classList.add('on');o.classList.remove('on');$('#cap').textContent=c.cap&&c.type!=='ph'?c.cap:'';
+ var ov=o.firstChild;setTimeout(function(){if(ov&&ov.pause)ov.pause()},1700);
+ clearTimeout(tm);tm=setTimeout(nextClip,dur*1000)}
+function nextClip(){ci++;if(ci>=clips.length){clearTimeout(tm);layers.forEach(function(l){var v=l.firstChild;if(v&&v.pause)v.pause()});go('#s3',2000);return}cur=1-cur;showClip()}
+$('#skip').onclick=nextClip;$('#mute').onclick=function(){muted=!muted;this.textContent=muted?'🔇':'🔊';layers.forEach(function(l){if(l.firstChild)l.firstChild.muted=muted})};
+/* hub */
+var found={},N=0;
+function egg(k,m,f){if(!found[k]){found[k]=1;N++;$('#n').textContent=N;if(N===11)setTimeout(function(){toast('You found all 11 :D, very peak :)');boom(null,null,220)},2700)}toast(m);if(f)boom()}
+function startCount(){var t=new Date(2026,10,21),el=$('#count');function up(){var d=t-new Date();if(d<=0){el.textContent='It’s your birthday!! :)';return}el.textContent=Math.floor(d/864e5)+' days '+Math.floor(d%864e5/36e5)+' hrs until Monster turns 20'}up();setInterval(up,60000)}startCount();
+var cc=0;$('#cat').onclick=function(){cc++;tone(520,.15);setTimeout(function(){tone(780,.25)},120);egg('cat',cc<4?'mrrp?':'the void cat has accepted you as her human')};
+$('#oc').onclick=function(){tone(440,.15);setTimeout(function(){tone(660,.25)},120);egg('orange','“Mrow, I miss you.”')};
+var mc=0;$('#mon').onclick=function(){mc++;if(mc>=5){var s=this;s.textContent='Alex';egg('alex','Plot twist: she has a real name too :D Hi, Alex :)',true);setTimeout(function(){s.textContent='Monster';mc=0},2500)}};
+$('#heart').onclick=function(){egg('heart','I’m really glad you exist.',true)};$('#heart').onkeydown=function(e){if(e.key==='Enter')this.click()};
+[].forEach.call(document.querySelectorAll('#ach li'),function(li){li.onclick=function(){li.classList.add('on');if(document.querySelectorAll('#ach li.on').length===11)egg('ach','Every achievement unlocked, Obviously :)',true);else tone(660,.2)}});
+var notes=[262,294,330,349,392,440,494,523],kb=$('#keys');
+'CDEFGABC'.split('').forEach(function(n,j){var b=document.createElement('button');b.textContent=n;b.onclick=function(){play(j)};kb.appendChild(b)});
+function play(j){tone(notes[j],.7);var b=kb.children[j];b.classList.add('p');setTimeout(function(){b.classList.remove('p')},150)}
+/* Hidden phrases are checked immediately on each key, using the same
+   suffix-matching approach as the Toodles and peak Easter eggs. */
+var typingBuffer='';
+function handleTyping(e){
+ var tag=(e.target&&e.target.tagName||'').toLowerCase();
+ if(tag==='input'||tag==='textarea'||tag==='select'||(e.target&&e.target.isContentEditable)||e.ctrlKey||e.altKey||e.metaKey)return;
+ if(e.key===' '){
+  var isTyping=/[a-z]$/i.test(typingBuffer);
+  if(joined&&!over&&!isTyping){e.preventDefault();if(S.paused)S.play();else S.pause()}
+  typingBuffer=(typingBuffer+' ').slice(-120);
+ }else if(e.key.length===1){
+  typingBuffer=(typingBuffer+e.key).slice(-120);
+ }else{return}
+ if($('#s3').className.indexOf('on')<0)return;
+ var b=typingBuffer.toLowerCase();
+ /* Suffix checks: same immediate method as Toodles and peak. Compound phrases are checked first. */
+ if(/(?:^|\s)(?:milis\s+and\s+monster|monster\s+and\s+milis|together|us)$/i.test(b)){catNotice('together');typingBuffer='';return}
+ if(/milis$/i.test(b)){catNotice('milis');typingBuffer='';return}
+ if(/monster$/i.test(b)){catNotice('monster');typingBuffer='';return}
+ if(/toodles$/i.test(b)){egg('toodles','Toodloo :)');typingBuffer='';return}
+ if(/peak$/i.test(b)){egg('peak','so peak, so peak',true);typingBuffer='';return}
+}
+addEventListener('keydown',handleTyping);
+/* Number-row piano shortcuts are enabled only while the piano has focus. */
+kb.addEventListener('click',function(){kb.focus()});
+addEventListener('keydown',function(e){if($('#s3').className.indexOf('on')<0||!kb.contains(document.activeElement))return;var tag=(e.target&&e.target.tagName||'').toLowerCase();if(tag==='input'||tag==='textarea'||tag==='select'||(e.target&&e.target.isContentEditable)||e.ctrlKey||e.altKey||e.metaKey)return;var k='12345678'.indexOf(e.key);if(k>-1){e.preventDefault();play(k)}});
+var cb=$('#cake');cb.onclick=function(){if(cb.classList.contains('out'))return;cb.classList.add('out');$('#wish').textContent='Wish made, You don’t have to tell me, (You can, though :D)';egg('cake','Happy birthday!! 🎂',true)};
+/* essay */
+var es=$('#essay'),io;
+$('#eo').onclick=function(e){var r=this.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;es.style.transition='none';es.style.clipPath='circle(0 at '+x+'px '+y+'px)';es.scrollTop=0;
+ var sh=$('#sheet');sh.innerHTML='<h4>Alex,</h4><div class="hint" id="hint"></div>';$('#hint').textContent=joined?'Music too loud to read with? Use the Jam bar at the bottom to pause it, or tap its arrow for volume :)':'Milis invited you to a Jam, you can join it and listen while you read :) OR you could pause it, read it, then play it :)';nudge('essay');var last;CFG.essay.forEach(function(t){var p=document.createElement('p');p.textContent=t;sh.appendChild(p);last=p});
+ var rd=document.createElement('button');rd.className='btn';rd.id='rd';rd.textContent='I read it :)';rd.style.display='none';sh.appendChild(rd);
+ io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');if(x.target===last)setTimeout(function(){rd.style.display='block'},1500)}})},{root:es,threshold:.35});
+ sh.querySelectorAll('p').forEach(function(p){io.observe(p)});
+ rd.onclick=finale;void es.offsetWidth;es.style.transition='';es.classList.add('open');es.style.clipPath='circle(150% at '+x+'px '+y+'px)'};
+$('#back').onclick=function(){es.classList.remove('open');es.style.clipPath='circle(0 at 50% 50%)'};
+/* finale */
+var onFinale=false;
+function finale(){var fc=$('#fc');
+ if(CFG.cats){fc.innerHTML='<img class="cats" alt="Two cats sitting side by side" src="'+CFG.cats+'">'}else{fc.innerHTML='<div class="pair"></div>';var p=fc.firstChild;['#oc','#cat'].forEach(function(id){var k=$(id).cloneNode(true);k.removeAttribute('id');p.appendChild(k)})}
+ $('#fmsg').textContent=CFG.finalMsg;
+ onFinale=true;$('#dock').classList.add('hidden');
+ es.style.pointerEvents='none';
+ var c=$('.stage.on'),n=$('#s4');c.classList.remove('on');n.classList.add('on');n.style.transition='none';n.style.opacity=1;$('#eggs').classList.add('hidden');scrollTo(0,0);
+ var rr=$('#rd').getBoundingClientRect();es.style.transition='clip-path 1.6s cubic-bezier(.7,0,.2,1)';es.style.clipPath='circle(0 at '+(rr.left+rr.width/2)+'px '+(rr.top+rr.height/2)+'px)';
+ setTimeout(function(){es.classList.remove('open');es.style.transition='';es.style.pointerEvents='';boom(null,null,150)},1800)}
+/* jam: one <audio> for the whole site, so the song never restarts between pages.
+   The small bottom bar (dock) and the big card on the last page are two views of the same player. */
+var S=$('#song'),SONGS=CFG.songs,si=0,joined=false,over=false,vol=.7,jm=false,gain=null,dstate='none',lastL=-1,nud={};
+var nativeVol=(function(){try{var a=new Audio();a.volume=.5;return a.volume===.5}catch(e){return true}})();
+function X(n){return [$('#'+n),$('#f'+n)].filter(Boolean)}
+function eT(n,t){X(n).forEach(function(e){e.textContent=t})}
+function eH(n,h){X(n).forEach(function(e){e.innerHTML=h})}
+function eC(n,c){X(n).forEach(function(e){e.className=c})}
+function eV(n,v){X(n).forEach(function(e){e.value=v})}
+function eD(n,d){X(n).forEach(function(e){e.disabled=d})}
+function eK(n,k,on){X(n).forEach(function(e){e.classList.toggle(k,on)})}
+function eAr(n,a,v){X(n).forEach(function(e){e.setAttribute(a,v)})}
+function eOn(n,fn){X(n).forEach(function(e){e.onclick=function(){fn(e)}})}
+function ic(p){return '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">'+p+'</svg>'}
+var IC={play:ic('<path d="M8 5v14l11-7z"/>'),pause:ic('<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>'),prev:ic('<path d="M6 6h2v12H6zM9.5 12L18 6v12z"/>'),next:ic('<path d="M16 6h2v12h-2zM6 18V6l8.5 6z"/>'),vol:ic('<path d="M3 9v6h4l5 4V5L7 9H3zM14 8.5a4.5 4.5 0 0 1 0 7zM14 4.3a9 9 0 0 1 0 15.4v-2a7 7 0 0 0 0-11.4z"/>'),mute:ic('<path d="M3 9v6h4l5 4V5L7 9H3z"/><path d="M15 9.5l5 5m0-5l-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>'),up:ic('<path d="M7 14l5-5 5 5z"/>'),down:ic('<path d="M7 10l5 5 5-5z"/>')};
+eH('pp',IC.pause);eH('prev',IC.prev);eH('next',IC.next);eH('mutebtn',IC.vol);$('#exp').innerHTML=IC.up;
+if(SONGS.length<2){eK('prev','hidden',true);eK('next','hidden',true)}
+document.querySelectorAll('.jav.him').forEach(function(e){if(CFG.pfpHim)e.style.backgroundImage='url('+CFG.pfpHim+')'});
+document.querySelectorAll('.jav.her').forEach(function(e){if(CFG.pfpHer)e.style.backgroundImage='url('+CFG.pfpHer+')'});
+function fmt(t){t=Math.floor(t||0);return Math.floor(t/60)+':'+('0'+t%60).slice(-2)}
+/* dock states: none, invite, bell, player */
+function setDock(s){dstate=s;$('#dock').classList.toggle('hidden',onFinale);$('#inv').classList.toggle('hidden',s!=='invite');$('#bell').classList.toggle('hidden',s!=='bell');$('#pl').classList.toggle('hidden',s!=='player')}
+function showInvite(){if(joined||dstate!=='none')return;setDock('invite');tone(880,.15);setTimeout(function(){tone(1175,.25)},140)}
+function nudge(k){if(joined||nud[k])return;nud[k]=1;setDock('invite')}
+function setOpen(o){var more=$('#more');$('#dock').classList.toggle('open',o);$('#exp').innerHTML=o?IC.down:IC.up;$('#exp').setAttribute('aria-expanded',o?'true':'false');if(o){more.classList.remove('hidden');requestAnimationFrame(function(){requestAnimationFrame(function(){more.classList.add('expanded')})})}else{more.classList.remove('expanded');setTimeout(function(){if(!$('#dock').classList.contains('open'))more.classList.add('hidden')},720)}}
+$('#later').onclick=function(){setDock('bell')};$('#bell').onclick=function(){setDock('invite')};
+$('#exp').onclick=function(){setOpen($('#more').classList.contains('hidden'))};
+/* volume: iPhones ignore audio.volume, so route through Web Audio there (set up after src is loaded, inside the Join tap) */
+var actx=null;
+function setupGain(){if(nativeVol||gain)return;try{var A=window.AudioContext||window.webkitAudioContext,ctx=new A(),node=ctx.createMediaElementSource(S);gain=ctx.createGain();node.connect(gain);gain.connect(ctx.destination);actx=ctx;if(ctx.resume)ctx.resume()}catch(e){gain=null}
+ if(!gain){eK('vrow','hidden',true);eK('voln','hidden',false)}}
+function applyVol(){S.muted=jm;if(nativeVol)S.volume=vol;else if(gain)gain.gain.value=vol;eH('mutebtn',(jm||vol===0)?IC.mute:IC.vol);eAr('mutebtn','aria-label',jm?'Unmute':'Mute')}
+X('vol').forEach(function(e){e.oninput=function(){vol=e.value/100;if(vol>0)jm=false;eV('vol',e.value);applyVol()}});
+eOn('mutebtn',function(){if(vol===0){vol=.5;eV('vol',50);jm=false}else jm=!jm;applyVol()});
+/* songs */
+function loadSong(i){si=i;var s=SONGS[i],by=s.by||'Milis';S.src=s.src;setupGain();eT('ptitle',s.title);eC('psub','');$('#psub').textContent='Added by '+by;$('#fpsub').textContent='Added by '+by+' · for Monster';lastL=-1;eH('lyr','');X('fill').forEach(function(e){e.style.width='0'});eV('seek',0);eT('tc','0:00');
+ eT('upnext',si<SONGS.length-1?'Up next: '+SONGS[si+1].title:'');eD('prev',false);eD('next',si>=SONGS.length-1);
+ applyVol();var pr=S.play();if(pr&&pr.catch)pr.catch(function(){eH('pp',IC.play);eK('pp','paused-heartbeat',true);toast('Tap play to start the music')})}
+var PH=[[0,4,'(line 1 goes here)'],[5,9,'(line 2 goes here)'],[10,14,'(line 3 goes here)'],[15,19,'(line 4 goes here)']];
+var LYRIC_FADE_IN=.35,LYRIC_FADE_OUT=.65,lastLyricText='';
+function lyricLine(line,index,all){
+ /* New format: [startSeconds,endSeconds,text]. Legacy [startSeconds,text]
+    remains supported; its end is the next line's start. */
+ if(line.length>=3)return {start:Number(line[0]),end:Number(line[1]),text:String(line[2])};
+ return {start:Number(line[0]),end:index+1<all.length?Number(all[index+1][0]):Infinity,text:String(line[1])};
+}
+function lyrTick(){
+ var L=(SONGS[si].lyrics&&SONGS[si].lyrics.length)?SONGS[si].lyrics:PH;
+ var t=S.currentTime||0,active=null;
+ if(!over){for(var i=0;i<L.length;i++){var line=lyricLine(L[i],i,L);if(t>=line.start&&t<line.end){active=line;break}}}
+ var text=active?active.text:'';
+ if(text!==lastLyricText){lastLyricText=text;X('lyr').forEach(function(el){el.textContent='';if(active){var sp=document.createElement('span');sp.textContent=active.text;el.appendChild(sp);
+   /* Keep the lyric slot a constant height and scale long lines down only as needed. */
+   sp.style.fontSize='';var base=parseFloat(getComputedStyle(el).fontSize)||16,min=el.closest('.more')?base*.72:base*.78;
+   var size=base;sp.style.fontSize=size+'px';
+   while(size>min&&(sp.scrollWidth>el.clientWidth||sp.scrollHeight>el.clientHeight)){size=Math.max(min,size-0.5);sp.style.fontSize=size+'px'}
+  }})}
+ X('lyr').forEach(function(el){var sp=el.firstElementChild;if(!sp)return;if(!active){sp.style.opacity='0';return}var fadeIn=LYRIC_FADE_IN>0?Math.min(1,(t-active.start)/LYRIC_FADE_IN):1;var fadeOut=LYRIC_FADE_OUT>0?Math.min(1,(active.end-t)/LYRIC_FADE_OUT):1;sp.style.opacity=String(Math.max(0,Math.min(1,fadeIn,fadeOut)))})
+}
+function joinJam(b){if(joined)return;joined=true;X('join').concat([$('#fjoin')]).forEach(function(e){e.disabled=true;e.textContent='Joining…'});loadSong(0);
+ setTimeout(function(){setDock('player');$('#finv').classList.add('hidden');$('#fpl').classList.remove('hidden');toast('Monster joined the Jam 💜');if(!onFinale&&!$('#essay').classList.contains('open'))setTimeout(function(){toast('Tap the arrow on the Jam bar for volume')},3200)},1100)}
+$('#join').onclick=function(){joinJam()};$('#fjoin').onclick=function(){joinJam()};
+S.addEventListener('play',function(){eK('pp','paused-heartbeat',false);if(actx&&actx.state==='suspended')actx.resume();if(!over){eH('pp',IC.pause);eAr('pp','aria-label','Pause')}});
+S.addEventListener('pause',function(){if(!over&&!S.ended){eH('pp',IC.play);eAr('pp','aria-label','Play');eK('pp','paused-heartbeat',true)}});
+S.addEventListener('error',function(){eC('psub','wrap');eT('psub','Couldn’t load this song. Check the file name in media/.')});
+S.addEventListener('loadedmetadata',function(){eT('td',fmt(S.duration))});
+S.addEventListener('timeupdate',function(){if(over)return;var d=S.duration||0;if(d){var f=S.currentTime/d;X('fill').forEach(function(e){e.style.width=(f*100)+'%'});X('seek').forEach(function(e){if(document.activeElement!==e)e.value=Math.round(f*1000)})}eT('tc',fmt(S.currentTime));eT('td',fmt(d));lyrTick()});
+S.addEventListener('ended',function(){if(si<SONGS.length-1){loadSong(si+1);return}
+ over=true;eH('pp',IC.play);eAr('pp','aria-label','Play');eK('pp','paused-heartbeat',true);X('fill').forEach(function(e){e.style.width='100%'});eV('seek',1000);eD('seek',true);eD('prev',true);eD('next',true);eH('lyr','');eT('upnext','');eC('psub','wrap');eT('psub',"Jam ended: (Dw you can invite me to a real one, I'll join when I'm available, or in the night :D), Thanks for listening, Monster :)")});
+eOn('pp',function(){if(over)return;if(S.paused)S.play();else S.pause()});
+X('seek').forEach(function(e){e.oninput=function(){if(over||!S.duration)return;S.currentTime=e.value/1000*S.duration}});
+eOn('next',function(){if(!over&&si<SONGS.length-1)loadSong(si+1)});
+eOn('prev',function(){if(over)return;if(S.currentTime>3||si===0)S.currentTime=0;else loadSong(si-1)});
+eOn('hb',function(e){var on=e.textContent==='♡';X('hb').forEach(function(h){h.textContent=on?'♥':'♡';h.style.color=on?'var(--pink)':''})});
+})();
+</script>
+</body>
+</html>
