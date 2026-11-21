@@ -580,7 +580,7 @@ $('#open').onclick=async function(){
  var bar=$('#bar');bar.classList.remove('hidden');$('#in').focus({preventScroll:true});log.scrollTop=log.scrollHeight;
  var v;await new Promise(function(res){function ck(){var s=$('#in').value;
   /* Hidden phone-message trigger: submit either phrase to flash the full screen and play the MP3. */
-  if(/\b(?:ur|your)\s+mom\b/i.test(s)){
+  if(/\b(?:ur|your)\s+mom\b/i.test(s) || /\bchicken\s+butt\b/i.test(s)){
    var flash=$('#momFlash'),audio=$('#momFlashSound');
    flash.classList.add('active');
    audio.pause();audio.currentTime=0;var playback=audio.play();if(playback&&playback.catch)playback.catch(function(){});
